@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+
+  # Backend
+    # Database (long term storage)
+  postgres: 
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=app_db
+    command: ["postgres", "-c", "log_statement=all"]
+
+    #Cache Database (short term storage)
+  redis:  
+    image: redis:alpine
+
+    # Backend API
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment: #define in future? 
+      - DATABASE_URL=postgres://postgres:postgres@postgres/app_db
+      - |
+        ROCKET_DATABASES={
+          postgres={url=postgres://postgres:postgres@postgres/app_db},
+          redis={url=redis://redis:6379}
+          }
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+      - redis
