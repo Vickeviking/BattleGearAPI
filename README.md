@@ -85,35 +85,10 @@ This project is licensed under the [MIT License](link to license file).
 
 ## Updating and Deploying Docker Image to Raspberry Pi
 
-1. **Build for platform:**
-    ```bash
-    docker buildx build --load -t armv7_battlegearapi:latest --progress plain --platform linux/arm/v7 .
-    ```
-
-2. **Save to .tar:**
-    ```bash
-    docker save armv7_battlegearapi:latest > armv7_battlegearapi.tar
-    ```
-
-3. **Send to Raspberry Pi:**
-    ```bash
-    scp armv7_battlegearapi.tar vango@192.168.0.215:docker_images
-    ```
-
-4. **Load .tar into Docker:**
-    ```bash
-    docker load < armv7_battlegearapi.tar
-    ```
-
-5. **Make a docker-compose (ONLY ONCE):**
-    ```bash
-    echo "version: '3'
-    services:
-      app:
-        image: armv7_battlegearapi:latest
-        ports:
-          - '8080:8080'" > docker-compose.yml
-    ```
+Build the whole with docker build 
+```bash
+    docker build
+```
 
 6. **Run:**
     ```bash
