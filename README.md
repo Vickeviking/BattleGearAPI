@@ -10,11 +10,26 @@ docker-compose exec app diesel migration run // run if not up
 // check with list that everything is up
 
 ### test
-docker-compose up   //starts container
-docker-compose exec app cargo run //opens up window of backend view
-docker-compose exec app diesel migration list // se if migrations are up
-docker-compose exec app diesel migration run // run if not up
-docker-compose exec app cargo test
+1. Start the container:
+    ```bash
+    docker-compose up
+    ```
+2. Open up the window of backend view:
+    ```bash
+    docker-compose exec app cargo run
+    ```
+3. Check if migrations are up:
+    ```bash
+    docker-compose exec app diesel migration list
+    ```
+4. Run if not up:
+    ```bash
+    docker-compose exec app diesel migration run
+    ```
+5. Run tests:
+    ```bash
+    docker-compose exec app cargo test
+    ```
 
 ## run commands in postgres
 docker ps #find id of postgres-latest
