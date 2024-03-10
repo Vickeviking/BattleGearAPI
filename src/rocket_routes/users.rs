@@ -49,7 +49,7 @@ pub async fn view_user(mut db: Connection<DbConn>, id: i32, _user: User) -> Resu
 
 //------------- create endpoint -------------
 #[rocket::post("/users", format="json", data="<new_user>")]
-pub async fn create_user(mut db: Connection<DbConn>, new_user: Json<NewUser>, _user: User) -> Result<Custom<Value>, Custom<Value>> {
+pub async fn create_user(mut db: Connection<DbConn>, new_user: Json<NewUser>) -> Result<Custom<Value>, Custom<Value>> {
     UserRepository::create(&mut db, new_user.into_inner(), vec![]).await
         .map(|user| Custom(Status::Created, json!(user)))
         .map_err(|e| server_error(e.into()))

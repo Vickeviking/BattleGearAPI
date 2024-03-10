@@ -10,13 +10,17 @@ use rocket_db_pools::Connection;
 
 #[rocket::post("/login", format="json", data="<credentials>")]
 pub async fn login(mut db: Connection<DbConn>, mut cache: Connection<CacheConn>, credentials: Json<Credentials>) -> Result<Value, Custom<Value>> {
+    // debug username and non username 
+    println!("username: {}", &credentials.username);
+    println!("password: {}", &credentials.password);
     // query the database for the user
     let user = UserRepository::find_by_username(&mut db, &credentials.username).await
         .map_err(|e| server_error(e.into()))?;
+    dbg!(&user);
 
     let session_id = authorize_user(&user, credentials.into_inner())
         .map_err(|_| Custom(Status::Unauthorized, json!("Invalid credentials")))?;
-
+    dbg!(&session_id);
     // create a session in the cache
     SessionRepository::create_session(&mut cache, session_id.clone(), user.user_id).await?;
 

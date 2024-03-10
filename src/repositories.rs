@@ -1,5 +1,6 @@
 use crate::{models::*, rocket_routes::CacheConn, schema::*};
 use crate::rocket_routes::server_error;
+use crate::auth::*;
 
 use serde_json::Value;
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
@@ -7,6 +8,7 @@ use diesel::prelude::*;
 use rocket::{response::status::Custom};
 use rocket_db_pools::Connection;
 use rocket_db_pools::deadpool_redis::redis::AsyncCommands;
+
 
 // ----------------- Seassions  -----------------
 pub struct SessionRepository;
@@ -32,6 +34,16 @@ impl UserRepository {  //CRUD operations for user
         users::table.filter(users::username.eq(username)).get_result(c).await
     }
 
+    pub async fn debug_all_usernames(c: &mut AsyncPgConnection) -> QueryResult<()> {
+        let all_users = users::table.load::<User>(c).await?;
+    
+        for user in all_users {
+            println!("Username: {}", user.username);
+        }
+    
+        Ok(())
+    }
+
     pub async fn find_with_roles(c: &mut AsyncPgConnection) -> QueryResult<Vec<(User, Vec<(UserRole, Role)>)>> {
         //load all users into a variabel 
         let users = users::table.load::<User>(c).await?;
@@ -49,7 +61,8 @@ impl UserRepository {  //CRUD operations for user
         users::table.limit(limit).get_results(c).await
     }
 
-    pub async fn create(c: &mut AsyncPgConnection, new_user: NewUser, role_codes: Vec<String>) -> QueryResult<User> {
+    pub async fn create(c: &mut AsyncPgConnection, mut new_user: NewUser, role_codes: Vec<String>) -> QueryResult<User> {
+        
         let user = diesel::insert_into(users::table)
             .values(&new_user)
             .get_result::<User>(c)
